@@ -1,26 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// App.tsx
+import React, { useState } from 'react';
+import axios from 'axios';
+import SearchInput from './SearchInput';
+import SearchResults from './SearchResults';
 
-function App() {
+const App: React.FC = () => {
+  const [results, setResults] = useState<any[]>([]);
+
+  const fetchSearchResults = async (query: string) => {
+    try {
+      const response = await axios.get(
+        `https://api.bing.microsoft.com/v7.0/search?q=${query}`,
+        {
+          headers: {
+            'Ocp-Apim-Subscription-Key': 'YOUR_BING_API_KEY',
+          },
+        }
+      );
+      setResults(response.data.webPages.value);
+    } catch (error) {
+      console.error('Error fetching search results:', error);
+    }
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container mt-4">
+      <h1 className="mb-4">Bing Search App</h1>
+      <SearchInput onSearch={fetchSearchResults} />
+      <SearchResults results={results} />
     </div>
   );
-}
+};
 
 export default App;
